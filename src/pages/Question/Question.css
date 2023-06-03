@@ -1,0 +1,121 @@
+.exam-container {
+    /* max-width: 1024px; */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.exam-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.question-container {
+    margin-bottom: 20px;
+}
+
+.question-heading {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.question-label,
+.answer-label,
+.selected-answer-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.question-input,
+.answer-input,
+.selected-answer-input {
+    width: 100%;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.submit-answer-button {
+    display: block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    font-size: 16px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.question-separator {
+    margin-top: 20px;
+    border: none;
+    border-top: 1px solid #ccc;
+}
+.form-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: lavender;
+}
+
+.title {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.form-row {
+    margin-bottom: 10px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-input-checkbox {
+    margin-top: 5px;
+}
+.form-button {
+    display: block;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+.list-button {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+.btn-close {
+    font-size: 20px;
+    margin-left: 8px;
+    cursor: pointer;
+}
+.btn-save {
+    margin-top: 10px;
+    background-color: #2e9d32 !important;
+}
+.float-left {
+    text-align: start;
+    padding-left: 42px;
+}

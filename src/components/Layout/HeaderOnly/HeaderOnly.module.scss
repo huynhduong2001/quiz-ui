@@ -1,0 +1,25 @@
+.container {
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 100vh;
+    height: 100%;
+    width: 100%;
+    max-width: 1366px;
+    margin: 0 auto;
+}
+@media screen and (min-width: 576px) {
+    .container {
+        background: initial;
+    }
+}
+
+.content {
+    position: relative;
+    margin: 0 auto;
+    padding: 0 0 100px;
+}
+@media screen and (min-width: 576px) {
+    .content {
+        padding: 124px 12px 12px;
+    }
+}
