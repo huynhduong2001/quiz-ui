@@ -1,28 +1,35 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-
-import { AuthContext } from '~/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from '~/pages/Exam/Exam.module.scss';
-import './Question.css';
+import styles2 from '~/pages/EditExam/EditExam.module.scss';
+import '~/pages/Question/Question.css';
+import { AuthContext } from '~/AuthContext';
+import { toast } from 'react-toastify';
+
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 
 const cx = classNames.bind(styles);
-const Question = () => {
+const cx2 = classNames.bind(styles2);
+const EditExam = () => {
     const { accessToken } = useContext(AuthContext);
+    const location = useLocation();
     const navigate = useNavigate();
 
-    const [idUser, setIdUser] = useState();
+    const exam = useRef(location.state?.data);
     const [title, setTitle] = useState('');
     const [dec, setDec] = useState('');
     const [avatar, setAvatar] = useState(null);
+    const [urlFile, setUrlFile] = useState(null);
     const [numberQuestion, setNumberQuestion] = useState(0);
     const [timeQuestion, setTimeQuestion] = useState(0);
     const [publicQuestion, setPublicQuestion] = useState(false);
 
     const [showQuestion, setShowQuestion] = useState(false);
+    const [error, setError] = useState('');
+
+    // const [userId, setUserId] = useState();
     //temp
     const [tempNameQuestion, setTempNameQuestion] = useState('');
     const [tempOptionsAnswer, setTempOptionsAnswer] = useState([
@@ -36,57 +43,120 @@ const Question = () => {
     const [correctAnswer, setCorrectAnswer] = useState(0);
 
     const questions = useRef([]);
+    const [showModal, setShowModal] = useState(false);
+    const openModal = () => {
+        setShowModal(true);
+    };
 
+    // Hàm xử lý đóng modal
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    //chuyen questions data có sẵn sang fomat mẫu
+    function fomat_question(questions, correctAnswers) {
+        const convertedQuestions = [];
+        for (let i = 0; i < questions.length; i++) {
+            const question = questions[i];
+            const options = [];
+
+            for (let j = 0; j < question.answers.length; j++) {
+                const answer = question.answers[j];
+                const isCorrect = correctAnswers[i] === j;
+                options.push({
+                    id: j,
+                    text: answer,
+                    isCorrect: isCorrect,
+                });
+            }
+
+            const convertedQuestion = {
+                text: question.questionText,
+                options: options,
+            };
+            convertedQuestions.push(convertedQuestion);
+        }
+        return convertedQuestions;
+    }
+    function base64ToBlob(base64String) {
+        const byteCharacters = atob(base64String);
+        const byteArrays = [];
+        const sliceSize = 1024;
+
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+        const blob = new Blob(byteArrays, { type: 'image/png' });
+        return new File([blob], 'avt.png', { type: 'image/png' });
+    }
+    function loadData() {
+        setTitle(exam.current.name);
+        setDec(exam.current.description);
+        setUrlFile(exam.current.image);
+        setNumberQuestion(exam.current.questions.length);
+        setTimeQuestion(exam.current.totalTime);
+        setPublicQuestion(exam.current.isPublic);
+        questions.current = fomat_question(exam.current.questions, exam.current.correctAnswers);
+        setTempNameQuestion(questions.current[currentQuestion].text);
+        setTempOptionsAnswer(questions.current[currentQuestion].options);
+        setShowQuestion(true);
+    }
     useEffect(() => {
-        fetch('https://quiz-app-nodejs.onrender.com/v1/user/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                x_authorization: accessToken,
-            },
-        })
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                const user = data.user;
-                console.log(user);
-                setIdUser(user._id);
-            })
-            .catch((error) => console.log(error));
-    }, [accessToken]);
-
+        loadData();
+    }, []);
     useEffect(() => {
         //cleans up
         return () => {
-            avatar && URL.revokeObjectURL(avatar.preview);
+            avatar && URL.revokeObjectURL(avatar);
         };
     }, [avatar]);
     const handlePreviewAvatar = (e) => {
+        // console.log(avatar);
         const file = e.target.files[0];
         setAvatar(file);
+        // setUrlFile(URL.createObjectURL(file));
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const base64String = reader.result;
+            // Xử lý chuỗi base64String ở đây (gửi lên API, hiển thị lên giao diện, v.v.)
+
+            // cắt data:image/jpeg;base64,
+            setUrlFile(base64String.substring(23));
+            console.log(base64String);
+        };
+
+        reader.readAsDataURL(file);
     };
 
     const handleCreateExam = (e) => {
         e.preventDefault(e);
         if (title.trim() === '') {
-            toast.error('Vui lòng nhập tiêu đề');
+            setError('Vui lòng nhập tiêu đề');
             return;
         }
         if (dec.trim() === '') {
-            toast.error('Vui lòng nhập mô tả');
+            setError('Vui lòng nhập mô tả');
             return;
         }
-        // if (avatar === null) {
-        //     toast.error('Vui lòng thêm hình ảnh');
-        //     return;
-        // }
+        if (avatar === null) {
+            setError('Vui lòng thêm hình ảnh');
+            return;
+        }
         if (numberQuestion <= 0) {
-            toast.error('Vui lòng xem lại số lượng câu hỏi');
+            setError('Vui lòng xem lại số lượng câu hỏi');
             return;
         }
         if (timeQuestion <= 0) {
-            toast.error('Vui lòng xem lại thời gian làm bài');
+            setError('Vui lòng xem lại thời gian làm bài');
             return;
         }
 
@@ -100,6 +170,7 @@ const Question = () => {
             ],
         }));
         setCorrectAnswer(0);
+        setError('');
         setShowQuestion(true);
     };
 
@@ -166,7 +237,6 @@ const Question = () => {
         questions.current[currentQuestion].options = newOptions;
         setTempOptionsAnswer(newOptions);
     };
-
     const checkNullQuestions = () => {
         for (let i = 0; i < questions.current.length; i++) {
             if (questions.current[i].text === '') return true;
@@ -176,7 +246,7 @@ const Question = () => {
         }
         return false;
     };
-    const handleSaveQuestion = () => {
+    const handleSaveQuestion = async () => {
         const isNull = checkNullQuestions();
         if (isNull) {
             toast.error('Không được bỏ trống!');
@@ -186,48 +256,67 @@ const Question = () => {
             questionText: question.text,
             answers: question.options.map((option) => option.text),
         }));
+        const updateQuestion = () => {
+            const temp = exam.current.questions;
+            for (let i = 0; i < fomatquestions.length; i++) {
+                temp[i].questionText = fomatquestions[i].questionText;
+                temp[i].answers = fomatquestions[i].answers;
+            }
+            return temp;
+        };
 
         const fomatAnswer = questions.current.map((question) =>
             question.options.findIndex((option) => option.isCorrect),
         );
+
+        const updatedQuestions = updateQuestion();
+
         const formData = new FormData();
-        formData.append('image', avatar);
-        formData.append('name', title);
+        formData.append('image', !avatar ? base64ToBlob(urlFile) : avatar);
         formData.append('totalTime', timeQuestion);
         formData.append('description', dec);
-        formData.append('questions', JSON.stringify(fomatquestions));
+        formData.append('questions', JSON.stringify(updatedQuestions));
         formData.append('correctAnswers', JSON.stringify(fomatAnswer));
-        formData.append('createdBy', idUser);
         formData.append('isPublic', publicQuestion);
-        console.log(typeof JSON.stringify(fomatquestions));
-        console.log(typeof JSON.parse(JSON.stringify(fomatquestions)));
-        // const exam = {
-        //     name: title,
-        //     // image: formData,
-        //     totalTime: timeQuestion,
-        //     description: dec,
-        //     questions: fomatquestions,
-        //     correctAnswers: fomatAnswer,
-        //     createdBy: idUser,
-        //     isPublic: publicQuestion,
-        // };
-        // console.log('exam:', exam, 'accessToken', accessToken);
+        formData.append('name', title);
 
-        fetch('https://quiz-app-nodejs.onrender.com/v1/exam/', {
-            method: 'POST',
+        try {
+            const id = exam.current._id;
+            const url = `https://quiz-app-nodejs.onrender.com/v1/exam/${id}`;
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    // content_type: 'multipart/form-data; boundary=<calculated when request is sent>',
+                    x_authorization: accessToken,
+                },
+                body: formData,
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    toast.success('Cập nhập thành công!');
+                    navigate('/createQuestion');
+                } else toast.error('Lưu thất bại');
+            }
+        } catch (error) {
+            console.error('error = ', error);
+        }
+    };
+    const handleDeleteExam = () => {
+        const id = exam.current._id;
+        console.log(id, accessToken);
+        const url = 'https://quiz-app-nodejs.onrender.com/v1/exam/' + id;
+        fetch(url, {
+            method: 'DELETE',
             headers: {
-                // 'Content-Type': 'multipart/form-data',
-                // 'Content-Type': 'application/json',
                 x_authorization: accessToken,
             },
-            body: formData,
-            // body: JSON.stringify(exam),
         })
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    toast.success('Tạo thành công!');
                     navigate('/createQuestion');
+                    toast.success('Xóa thành công!');
                 } else toast.error(data.message);
                 console.log(data);
             })
@@ -238,8 +327,12 @@ const Question = () => {
     };
     return (
         <div className="exam-container">
-            <h1 className="exam-title">Tạo đề thi</h1>
+            <button className={cx2('form-button', 'btn-delete')} onClick={openModal}>
+                Xóa
+            </button>
+            <h1 className="exam-title">Sửa đề thi</h1>
             <div className="form-container">
+                {error && <p className={cx('error-message')}>{error}</p>}
                 <input
                     type="text"
                     placeholder="Nhập tiêu đề"
@@ -262,7 +355,14 @@ const Question = () => {
                         className="form-input"
                         onChange={(e) => handlePreviewAvatar(e)}
                     />
-                    {avatar && <img src={URL.createObjectURL(avatar)} alt="" width="50%" className="flex mg-auto" />}
+                    {urlFile && (
+                        <img
+                            src={`data:image/jpeg;base64,${urlFile}`}
+                            alt="Image"
+                            width="50%"
+                            className="flex mg-auto"
+                        />
+                    )}
                 </div>
                 <div className="form-row">
                     <label className="form-label">Số lượng câu hỏi của bài kiểm tra</label>
@@ -274,7 +374,7 @@ const Question = () => {
                     />
                 </div>
                 <div className="form-row">
-                    <label className="form-label">Thời gian làm bài kiểm tra (giây)</label>
+                    <label className="form-label">Thời gian làm bài kiểm tra (phút)</label>
                     <input
                         type="number"
                         className="form-input"
@@ -288,11 +388,11 @@ const Question = () => {
                         type="checkbox"
                         className="form-input-checkbox"
                         checked={publicQuestion}
-                        onChange={(e) => setPublicQuestion(!publicQuestion)}
+                        onChange={() => setPublicQuestion(!publicQuestion)}
                     />
                 </div>
 
-                <button className="form-button" onClick={(e) => handleCreateExam(e)}>
+                <button disabled className="form-button bg-light-1" onClick={(e) => handleCreateExam(e)}>
                     Tạo
                 </button>
             </div>
@@ -355,8 +455,23 @@ const Question = () => {
                             </button>
                         </div>
                         <button className={cx('btn-exam', 'btn-save')} onClick={() => handleSaveQuestion()}>
-                            Lưu
+                            Cập nhật
                         </button>
+                    </div>
+                </div>
+            )}
+            {showModal && (
+                <div className={cx2('modal')}>
+                    <div className={cx2('modal-content')}>
+                        {/* Nội dung của modal */}
+                        <h2>Xóa đề thi</h2>
+                        <p>Bạn có thật sự muốn xóa đề thi?</p>
+                        <div className="list-button">
+                            <button className={cx2('bg-red')} onClick={() => handleDeleteExam()}>
+                                Xóa
+                            </button>
+                            <button onClick={closeModal}>Đóng</button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -364,4 +479,4 @@ const Question = () => {
     );
 };
 
-export default Question;
+export default EditExam;

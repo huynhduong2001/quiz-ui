@@ -3,8 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './Header.module.scss';
-import images from '~/assets/images';
-
+import logo from '~/assets/images/logo.jpg';
 const cx = classNames.bind(styles);
 
 function Header() {
@@ -15,7 +14,8 @@ function Header() {
                     <div className={cx('logo-img-container')}>
                         <a href="/" className={cx('link-is-active')}>
                             <span className={cx('logo-q')}>
-                                <img src={images.logo} alt="quizizz" />
+                                {/* <img src={images.logo} alt="quizizz" /> */}
+                                <img src={logo} alt="quizizz" />
                             </span>
                         </a>
                     </div>
@@ -26,7 +26,7 @@ function Header() {
                             placeholder="Tìm quiz"
                             data-cy="header-search-field"
                         />
-                        <a data-cy="header-search-button">
+                        <a data-cy="header-search-button" href="/">
                             <span className={cx('search-icon-container')}>
                                 <FontAwesomeIcon icon={faMagnifyingGlass} className={cx('search-icon')} />
                             </span>

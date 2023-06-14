@@ -119,3 +119,7 @@
     text-align: start;
     padding-left: 42px;
 }
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+}

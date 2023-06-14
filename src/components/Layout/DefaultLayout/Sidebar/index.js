@@ -1,11 +1,25 @@
+import { useNavigate } from 'react-router-dom';
+
 import styles from './Sidebar.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook, faBookBookmark, faHouse, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
+import { AuthContext } from '~/AuthContext';
+import { useContext } from 'react';
 
 const cx = classNames.bind(styles);
 
 function Sidebar() {
+    const { setIsLoggedIn } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const Logout = () => {
+        setIsLoggedIn(false);
+        localStorage.clear();
+        navigate('/login');
+    };
+    // ('active text-lilac font-semibold bg-light-1');
+
     return (
         <div className={cx('sidebar-container')}>
             <div
@@ -15,9 +29,10 @@ function Sidebar() {
                 <div className={cx('sidebar-navigation flex flex-col overflow-y-auto')}>
                     <a
                         aria-current="page"
-                        href="/"
+                        // href="/"
+                        onClick={() => navigate('/')}
                         className={cx(
-                            'router-link-active router-link-exact-active link flex items-center pl-4 whitespace-nowrap w-full hover:bg-light-1 cursor-pointer py-2 active text-lilac font-semibold bg-light-1',
+                            'link flex items-center pl-4 whitespace-nowrap w-full hover:bg-light-1 cursor-pointer py-2 ',
                         )}
                         exactpath=""
                         aria-label="Trang chủ"
@@ -33,7 +48,8 @@ function Sidebar() {
                         className={cx(
                             'link flex items-center pl-4 whitespace-nowrap w-full hover:bg-light-1 cursor-pointer py-2 text-dark-4',
                         )}
-                        href="/myLibrary"
+                        // href="/myLibrary"
+                        onClick={() => navigate('/myLibrary')}
                         exactpath=""
                         aria-label="Thư viện của tôi"
                     >
@@ -41,28 +57,30 @@ function Sidebar() {
                             <div className={cx('flex items-center justify-center w-6')}>
                                 <FontAwesomeIcon icon={faBookBookmark} className={cx('fs-12')}></FontAwesomeIcon>
                             </div>
-                            <span className={cx('text-sm whitespace-nowrap pl-1')}>Thư viện của tôi</span>
+                            <span className={cx('text-sm whitespace-nowrap pl-1')}>Lịch sử thi</span>
                         </div>
                     </a>
                     <a
                         className={cx(
                             'link flex items-center pl-4 whitespace-nowrap w-full hover:bg-light-1 cursor-pointer py-2 text-dark-4',
                         )}
-                        href="/createQuestion"
+                        // href="/createQuestion"
+                        onClick={() => navigate('/createQuestion')}
                         aria-label="Tạo đề thi"
                     >
                         <div className={cx('flex items-center w-full')}>
                             <div className={cx('flex items-center justify-center w-6')}>
                                 <FontAwesomeIcon icon={faBook} className={cx('fs-12')}></FontAwesomeIcon>
                             </div>
-                            <span className={cx('text-sm whitespace-nowrap pl-1')}>Tạo đề thi</span>
+                            <span className={cx('text-sm whitespace-nowrap pl-1')}>Quản lý đề thi</span>
                         </div>
                     </a>
                     <a
                         className={cx(
                             'link flex items-center pl-4 whitespace-nowrap w-full hover:bg-light-1 cursor-pointer py-2 text-dark-4',
                         )}
-                        href="/myAccount"
+                        // href="/myAccount"
+                        onClick={() => navigate('/myAccount')}
                         exactpath=""
                         aria-label="Tài khoản"
                     >
@@ -77,9 +95,10 @@ function Sidebar() {
                         className={cx(
                             'link flex items-center pl-4 whitespace-nowrap w-full hover:bg-light-1 cursor-pointer py-2 text-dark-4',
                         )}
-                        href="/"
+                        // href="/login"
                         exactpath=""
                         aria-label="Đăng xuất"
+                        onClick={() => Logout()}
                     >
                         <div className={cx('flex items-center w-full')}>
                             <div className={cx('flex items-center justify-center w-6')}>

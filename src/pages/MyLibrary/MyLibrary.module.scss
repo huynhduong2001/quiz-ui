@@ -32,3 +32,19 @@
     white-space: nowrap;
     overflow: hidden;
 }
+.dec {
+    font-weight: 500;
+    font-size: 14px;
+}
+.btn-close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    color: red;
+    font-size: 24px;
+    cursor: pointer;
+}
+.btn-close:hover {
+    color: rgb(11, 56, 56);
+}

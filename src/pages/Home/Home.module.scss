@@ -269,6 +269,34 @@
     border: none;
 }
 //--------------------list-dethi------------------
+.featured-section-header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.featured-section-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #292a3a;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
 .solo-quizzes {
     display: flex;
     flex-wrap: wrap;
@@ -433,7 +461,7 @@
 }
 .quiz-name {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     margin: 12px 12px 0;
     text-align: left;
     color: #292a3a;
@@ -443,6 +471,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
+}
+.quiz-dec {
+    font-weight: 400;
 }
 @media (min-width: 576px) {
     .quiz-name {

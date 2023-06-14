@@ -572,3 +572,15 @@ button.q-shadow.base {
 .inline-box {
     display: -webkit-inline-box;
 }
+.max-height {
+    min-height: 100vh;
+}
+.space-around {
+    display: flex;
+    justify-content: space-around;
+}
+.avt-small {
+    border-radius: 100px;
+    height: 36px;
+    width: 36px;
+}

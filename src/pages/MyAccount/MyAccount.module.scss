@@ -5,3 +5,23 @@
     width: 672px;
     box-shadow: 0 1px 3px #0000001a, 0 4px 6px #0000001c;
 }
+.file-input {
+    display: none;
+}
+
+.upload-button-label {
+    display: inline-block;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.upload-button-text {
+    font-size: 14px;
+}
+
+.upload-button-label:hover {
+    background-color: #e0e0e0;
+}

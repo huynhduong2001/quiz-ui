@@ -11,19 +11,24 @@ import Exam from '~/pages/Exam';
 import Login from '~/pages/Login';
 import Register from '~/pages/Register';
 import ForgotPassword from '~/pages/ForgotPassWord';
+import ReviewResult from '~/pages/ReviewResult';
+import EditExam from '~/pages/EditExam';
 const publicRoutes = [
-    { path: '/', component: Home },
-    { path: '/myLibrary', component: MyLibrary },
-    { path: '/createQuestion', component: CreateQuestion },
-    { path: '/myAccount', component: MyAccount },
-    { path: '/join', component: Join, layout: HeaderOnly },
-    { path: '/question', component: Question, layout: HeaderOnly },
-    { path: '/exam', component: Exam, layout: HeaderOnly },
     { path: '/login', component: Login, layout: NoneLayout },
     { path: '/register', component: Register, layout: NoneLayout },
     { path: '/forgotpw', component: ForgotPassword, layout: NoneLayout },
 ];
 
-const privateRoutes = [];
+const privateRoutes = [
+    { path: '/', component: Home },
+    { path: '/myLibrary', component: MyLibrary },
+    { path: '/myLibrary/reviewResult', component: ReviewResult },
+    { path: '/createQuestion', component: CreateQuestion },
+    { path: '/createQuestion/editExam', component: EditExam },
+    { path: '/myAccount', component: MyAccount },
+    { path: '/join', component: Join, layout: HeaderOnly },
+    { path: '/question', component: Question },
+    { path: '/exam', component: Exam },
+];
 
 export { publicRoutes, privateRoutes };

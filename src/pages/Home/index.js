@@ -1,24 +1,106 @@
+import { Fragment, useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { AuthContext } from '~/AuthContext';
 import styles from './Home.module.scss';
 import classNames from 'classnames/bind';
-
 const cx = classNames.bind(styles);
+
 function Home() {
+    const { accessToken } = useContext(AuthContext);
+    const [user, setUser] = useState();
+    const navigate = useNavigate();
+    const [allDatas, setAllDatas] = useState([]);
+    const [codeJoin, setCodeJoin] = useState('');
+    useEffect(() => {
+        if (accessToken) {
+            fetchAllDatas();
+        }
+    }, [accessToken]);
+    useEffect(() => {
+        fetch('https://quiz-app-nodejs.onrender.com/v1/user/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                x_authorization: accessToken,
+            },
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                const user = data.user;
+                setUser(user);
+            })
+            .catch((error) => console.log(error));
+    }, []);
+    const fetchAllDatas = () => {
+        fetch('https://quiz-app-nodejs.onrender.com/v1/exam/all')
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                setAllDatas(data.exams || []);
+                console.log(data);
+            })
+            .catch((error) => console.log(error));
+    };
+
+    const fetchJoinExam = async (idExam) => {
+        const url = 'https://quiz-app-nodejs.onrender.com/v1/exam/info-exam/';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ examId: idExam }),
+            });
+            console.log(response);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    toast.success('Vào phòng thi thành công!');
+                    navigate('/exam', { state: { data: data.message._id } });
+                } else toast.error('Không tìm thấy mã phòng!');
+            } else {
+                toast.error('Không tìm thấy mã phòng!');
+            }
+        } catch (error) {
+            console.error('Lỗi khi gọi API:', error);
+            toast.error('Đã xảy ra lỗi khi gọi API!');
+        }
+    };
+    const handleJoinGame = async () => {
+        if (!codeJoin) {
+            toast.error('Vui lòng nhập mã tham gia!');
+            return;
+        }
+        fetchJoinExam(codeJoin);
+    };
+
+    const handleJoinExamPublic = (id) => {
+        navigate('/exam', { state: { data: id } });
+    };
+
     return (
-        <>
+        <Fragment>
             <div className={cx('content-actionable')}>
                 <div className={cx('home-proceed-game-container', 'theme-streak')}>
                     <div className={cx('home-proceed-game')}>
                         <div className={cx('proceed-game-container')}>
-                            <form className={cx('proceed-game-action-wrapper')}>
+                            <div className={cx('proceed-game-action-wrapper')}>
                                 <div className={cx('proceed-game-input-container')}>
                                     <input
                                         className={cx('check-room-input')}
                                         placeholder="Nhập mã tham gia"
                                         type="tel"
                                         pattern="\d*"
-                                        maxlength="8"
                                         aria-label="Nhập mã tham gia để chơi một trò chơi"
                                         data-cy="gamecode-field"
+                                        value={codeJoin}
+                                        onChange={(e) => setCodeJoin(e.target.value)}
                                     />
                                 </div>
                                 <button
@@ -26,11 +108,11 @@ function Home() {
                                     isfloating="true"
                                     className={cx('check-room-button', 'text-unselectable')}
                                     data-cy="joinGame-button"
-                                    type="submit"
+                                    onClick={() => handleJoinGame()}
                                 >
                                     <span className={cx('visible')}>THAM GIA</span>
                                 </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -57,22 +139,25 @@ function Home() {
                                         aria-label="Chọn avatar."
                                     >
                                         <div className={cx('select-avatar')}>
-                                            <span className={cx('select-avatar-icon')}> + </span>
+                                            <span className={cx('select-avatar-icon')}>
+                                                <img
+                                                    className={cx('media-dimensions', 'media', 'avt-small')}
+                                                    src={`data:image/jpeg;base64,${user && user.image}`}
+                                                    alt=""
+                                                    width="50%"
+                                                />
+                                            </span>
                                         </div>
                                     </button>
-                                    <p className={cx('player-name')}>Dương Huỳnh</p>
+                                    <p className={cx('player-name')}>
+                                        {user && user.lastname} {user && user.firstname}
+                                    </p>
                                 </div>
                                 <div className={cx('player-info')}>
                                     <div className={cx('links-container', 'flex-view', 'all-center')}>
-                                        <a href="/join/settings">
+                                        <a onClick={() => navigate('/myAccount')}>
                                             <div className={cx('hero-button')}>
                                                 <span>Chỉnh sửa Hồ sơ</span>
-                                            </div>
-                                        </a>
-                                        <span className={cx('dot-separator')}>●</span>
-                                        <a href="/join/activity">
-                                            <div className={cx('hero-button')}>
-                                                <span>Xem Hoạt động</span>
                                             </div>
                                         </a>
                                     </div>
@@ -84,59 +169,56 @@ function Home() {
             </div>
 
             {/* list bai thi */}
-            <div className={cx('featured-section-quizzzes')}>
-                <div className={cx('solo-quiz-container', 'text-unselectable')}>
-                    <div className={cx('solo-quizzes')}>
-                        <button
-                            aria-label="Quiz Information Card"
-                            type="button"
-                            className={cx('solo-quiz', 'max-in-row-2', 'max-in-row-3', 'max-in-row-4', 'max-in-row-5')}
-                            data-cy="solo-quiz-0"
-                        >
-                            <div className={cx('curved-edge-container', 'media-dimensions', 'media-wrapper')}>
-                                <div className={cx('curve')}>
-                                    <div className={cx('content-container')}>
-                                        <img
-                                            className={cx('media-dimensions', 'media')}
-                                            aria-label="Quiz thumbnail"
-                                            src="https://media.quizizz.com/_mdserver/main/media/resource/gs/quizizz-media/quizzes/d4b5f497-d247-412f-8640-15de5e285c00-v2?w=200&amp;h=200"
-                                        ></img>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* <div className={cx('quiz-info')}>
-                                <span className={cx('questions-length')}>25 slide</span>
-                                <span className={cx('times-played')}>14k lần chơi</span>
-                            </div> */}
-                            <p className={cx('quiz-name')}>Ôn Toán Giữa Kì 2</p>
-                        </button>
-                        <button
-                            aria-label="Quiz Information Card"
-                            type="button"
-                            className={cx('solo-quiz', 'max-in-row-2', 'max-in-row-3', 'max-in-row-4', 'max-in-row-5')}
-                            data-cy="solo-quiz-1"
-                        >
-                            <div className={cx('curved-edge-container', 'media-dimensions', 'media-wrapper')}>
-                                <div className={cx('curve')}>
-                                    <div className={cx('content-container')}>
-                                        <img
-                                            className={cx('media-dimensions', 'media')}
-                                            aria-label="Quiz thumbnail"
-                                            src="https://media.quizizz.com/_mdserver/main/media/resource/gs/quizizz-media/quizzes/06664d85-294b-4f22-9d24-1d3829484b87-v2?w=200&amp;h=200"
-                                        ></img>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* <div className={cx('quiz-info')}>
-                                <span className={cx('questions-length')}>12 Qs</span>
-                                <span className={cx('times-played')}>1k lần chơi</span>
-                            </div> */}
-                            <p className={cx('quiz-name')}>ÔN TRẮC NGHIỆM TOÁN 7 KỲ 2</p>
-                        </button>
+
+            <div>
+                <div className={cx('featured-section-header')}>
+                    <div className={cx('featured-section-title', 'text-unselectable')}>
+                        <span>Có thể bạn quan tâm</span>
+                    </div>
+                </div>
+                <div className={cx('featured-section-quizzzes')}>
+                    <div className={cx('solo-quiz-container', 'text-unselectable')}>
+                        <div className={cx('solo-quizzes')}>
+                            {allDatas &&
+                                allDatas.map((data) => (
+                                    <button
+                                        key={data._id}
+                                        aria-label="Quiz Information Card"
+                                        type="button"
+                                        className={cx(
+                                            'solo-quiz',
+                                            'max-in-row-2',
+                                            'max-in-row-3',
+                                            'max-in-row-4',
+                                            'max-in-row-5',
+                                        )}
+                                        data-cy="solo-quiz-0"
+                                        onClick={() => handleJoinExamPublic(data._id)}
+                                    >
+                                        <div
+                                            className={cx('curved-edge-container', 'media-dimensions', 'media-wrapper')}
+                                        >
+                                            <div className={cx('curve')}>
+                                                <div className={cx('content-container')}>
+                                                    <img
+                                                        className={cx('media-dimensions', 'media')}
+                                                        src={`data:image/jpeg;base64,${data.image}`}
+                                                        alt=""
+                                                        width="50%"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <p className={cx('quiz-name')}>{data.name}</p>
+                                        <p className={cx('quiz-name', 'quiz-dec')}>{data.description}</p>
+                                    </button>
+                                ))}
+                        </div>
                     </div>
                 </div>
             </div>
-        </>
+        </Fragment>
     );
 }
 
