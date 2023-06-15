@@ -17,7 +17,7 @@ const Question = () => {
     const [idUser, setIdUser] = useState();
     const [title, setTitle] = useState('');
     const [dec, setDec] = useState('');
-    const [avatar, setAvatar] = useState(null);
+    const [avatar, setAvatar] = useState('');
     const [numberQuestion, setNumberQuestion] = useState(0);
     const [timeQuestion, setTimeQuestion] = useState(0);
     const [publicQuestion, setPublicQuestion] = useState(false);
@@ -199,6 +199,7 @@ const Question = () => {
         formData.append('correctAnswers', JSON.stringify(fomatAnswer));
         formData.append('createdBy', idUser);
         formData.append('isPublic', publicQuestion);
+        // if (avatar) formData.append('image', avatar);
         console.log(typeof JSON.stringify(fomatquestions));
         console.log(typeof JSON.parse(JSON.stringify(fomatquestions)));
         // const exam = {

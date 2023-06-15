@@ -279,7 +279,8 @@ const EditExam = () => {
         formData.append('correctAnswers', JSON.stringify(fomatAnswer));
         formData.append('isPublic', publicQuestion);
         formData.append('name', title);
-
+        console.log(JSON.stringify(updatedQuestions));
+        console.log(JSON.stringify(fomatAnswer));
         try {
             const id = exam.current._id;
             const url = `https://quiz-app-nodejs.onrender.com/v1/exam/${id}`;

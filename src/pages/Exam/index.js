@@ -57,6 +57,7 @@ function Exam() {
                 if (data.success) {
                     setExam(data.message);
                     setSeconds(data.message.totalTime);
+                    answers.current = Array.from({ length: data.message.questions.length });
                 } else toast.error('Không tìm thấy phòng thi!');
             } else {
                 toast.error('Không tìm thấy phòng thi!');
